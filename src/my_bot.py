@@ -1,6 +1,7 @@
 import traceback
 from abc import ABC
 from typing import List
+import math
 
 import lugo4py
 from settings import get_my_expected_position
@@ -69,6 +70,7 @@ class MyBot(lugo4py.Bot, ABC):
             if dist_to_goal <= 2200:
                 my_order = self.kick_to_goal(me, inspector, opponent_goal)
             elif obstacles and lugo4py.distance_between_points(obstacles[0], me.position) < lugo4py.PLAYER_SIZE * 5:
+                
                 close_allies = self.nearest_players(
                     my_team,
                     me.position,
@@ -94,20 +96,70 @@ class MyBot(lugo4py.Bot, ABC):
     
         try:
             ball_position = inspector.get_ball().position
-            move_order = self.determine_catchers(inspector, ball_position,1)
-            return [move_order]
+            me = inspector.get_me()
+            # move_order = self.determine_catchers(inspector, ball_position,1)
+            move_destination = get_my_expected_position(inspector, self.mapper, self.number)
+
+            if inspector.get_ball().holder.number == 1 and self.number == 2: 
+                move_destination = get_my_expected_position(inspector, self.mapper, self.number)
+                my_order = inspector.make_order_move_max_speed(move_destination)
+                return [my_order]
+            
+            close_players = self.nearest_players(
+                inspector.get_my_team_players(),
+                ball_position,
+                3,
+                [1, inspector.get_ball().holder.position]
+            )
+            print("tenho que acompanhar ",close_players)
+            if any( player['number'] == self.number for player in close_players):
+                dist_to_mate = lugo4py.distance_between_points(me.position, ball_position)
+                if dist_to_mate > lugo4py.PLAYER_SIZE*4:
+                    move_destination = ball_position
+                else: 
+                    opponent_goal = self.mapper.get_attack_goal()
+                    goal_center = opponent_goal.get_center()
+                    move_destination = goal_center
+            move_order = self.position_allies_around_holder(inspector)
+            if move_order == None:
+                move_order = inspector.make_order_move_max_speed(move_destination)
+
+            catch_order = inspector.make_order_catch()
+
+            return [move_order, catch_order]
 
         except Exception as e:
             print(f'did not play this turn due to exception {e}')
             traceback.print_exc()
-
+    # def tabelinha():
     def as_goalkeeper(self, inspector: lugo4py.GameSnapshotInspector, state: lugo4py.PLAYER_STATE) -> List[lugo4py.Order]:
         try:
             position = inspector.get_ball().position
 
             if state != lugo4py.PLAYER_STATE.DISPUTING_THE_BALL:
+                print(" o goleiro esta indo na !")
+
                 position = self.mapper.get_attack_goal().get_center()
 
+            if state == lugo4py.PLAYER_STATE.HOLDING_THE_BALL: 
+                me = inspector.get_me()
+                my_team = inspector.get_my_team_players()
+                print(" o goleiro esta com a bola !")
+                close_allies = self.nearest_players(
+                my_team,
+                me.position,
+                3, # pega tres players mais proximos do proprio time
+                [1, self.number] # ignora goleiro e eu mesmo
+                )
+                best_pass_player = self.find_best_pass(close_allies, me.position, inspector)
+                if best_pass_player.position is None: 
+                    position_pass = lugo4py.Point(4900, 7500)
+                else:
+                    position_pass = best_pass_player.position
+            
+                print("chute na direção ", position_pass)
+                my_order = inspector.make_order_kick_max_speed(position_pass)
+                return [my_order]
             my_order = inspector.make_order_move_max_speed(position)
 
             return [my_order, inspector.make_order_catch()]
@@ -169,10 +221,7 @@ class MyBot(lugo4py.Bot, ABC):
                 free_players.append(ally)
 
         return free_players
-    
-    def make_best_pass(self, close_teamates, my_position, inspector: lugo4py.GameSnapshotInspector):
-        ...
-    
+       
     def nearest_players(self, players, point_target, count, ignore):
         players_dist = []
         for player in players:
@@ -271,39 +320,70 @@ class MyBot(lugo4py.Bot, ABC):
 
         candidates.sort(key=lambda x: x['score'], reverse=True)
         return candidates[0]['player']
+    
+    def position_allies_around_holder(self, inspector: lugo4py.GameSnapshotInspector):
+        # Obter a posição do jogador que está segurando a bola
+        ball_holder = inspector.get_ball().holder
+        ball_holder_position = ball_holder.position
 
-    """
-        def find_best_pass(self, close_mates, my_position, reader):
-    candidates = []
-    opponents = [p.get_position() for p in reader.get_opponent_team().get_players_list()]
-    goal_center = reader.get_opponent_goal().get_center()
+        # Distância que os aliados devem manter do portador da bola
+        distance = lugo4py.PLAYER_SIZE * 5
 
-    for candidate in close_mates:
-        if candidate['dist'] > SPECS.PLAYER_SIZE * 8:
-            continue
+        # Encontrar os 3 aliados mais próximos do portador da bola
+        my_team = inspector.get_my_team_players()
+        closest_allies = self.nearest_players(
+            my_team, 
+            ball_holder_position,
+            3,
+            ignore=[ball_holder.number]
+        )
 
-        obstacles = self.find_obstacles(my_position, candidate['player'].get_position(), opponents, SPECS.PLAYER_SIZE * 2)
-        candidates_obstacles_to_kick = self.find_obstacles(candidate['player'].get_position(), goal_center, opponents, SPECS.PLAYER_SIZE * 2)
+        # Calcular as novas posições para os 3 aliados
+        positions = []
 
-        dist_to_goal = geo.distance_between_points(candidate['player'].get_position(), goal_center)
-
-        score = 0
-        score -= len(obstacles) * 10
-        score -= (candidate['dist'] / SPECS.PLAYER_SIZE) / 2
-        score -= (dist_to_goal / SPECS.PLAYER_SIZE) * 2
-
-        if not candidates_obstacles_to_kick:
-            score += 30
-
-        candidates.append({
-            'score': score,
-            'player': candidate['player']
+        # Posição 1: Diagonal superior (45 graus)
+        angle_upper_diagonal = 45
+        new_position_upper = self.calculate_new_position(ball_holder_position, distance, angle_upper_diagonal)
+        positions.append({
+            'player': closest_allies[0]['player'],
+            'position': new_position_upper
         })
 
-    if not candidates:
-        return None
+        # Posição 2: Diagonal inferior (135 graus)
+        angle_lower_diagonal = 315
+        new_position_lower = self.calculate_new_position(ball_holder_position, distance, angle_lower_diagonal)
+        positions.append({
+            'player': closest_allies[1]['player'],
+            'position': new_position_lower
+        })
 
-    candidates.sort(key=lambda x: x['score'], reverse=True)
-    return candidates[0]['player']
+        # Posição 3: Atrás do portador da bola (180 graus)
+        angle_behind = 180
+        new_position_behind = self.calculate_new_position(ball_holder_position, distance, angle_behind)
+        positions.append({
+            'player': closest_allies[2]['player'],
+            'position': new_position_behind
+        })
 
-    """
+        # Criar ordens para mover os aliados para as novas posições
+        # move_orders = []
+        move_order = None
+        for ally in positions:
+            if self.number == ally['player'].number and ally['position']["x"] > 0 and ally['position']["y"] > 0 :
+                move_order = inspector.make_order_move_max_speed(lugo4py.Point(ally['position']["x"],ally['position']["y"]))
+                print(f" eu tenho que estar em : x = { ally['position'] } ,  y = { ally['position'] }")
+     
+        return move_order
+
+    def calculate_new_position(self, origin_position, distance, angle_degrees):
+     
+        angle_radians = math.radians(angle_degrees)
+
+        delta_x = distance * math.cos(angle_radians)
+        delta_y = distance * math.sin(angle_radians)
+        new_position = {
+            "x" : origin_position.x + delta_x,
+            "y" : origin_position.y + delta_y
+        }
+
+        return new_position

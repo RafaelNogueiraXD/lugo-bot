@@ -207,7 +207,7 @@ services:
       - BOT_GRPC_URL=game_server:5000
 
   player_away_01:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -220,7 +220,7 @@ services:
       - BOT_GRPC_URL=game_server:5000
 
   player_away_02:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -233,7 +233,7 @@ services:
       - BOT_GRPC_URL=game_server:5000
 
   player_away_03:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -245,7 +245,7 @@ services:
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_04:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -257,7 +257,7 @@ services:
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_05:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -269,7 +269,7 @@ services:
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_06:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -281,7 +281,7 @@ services:
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_07:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -293,7 +293,7 @@ services:
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_08:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -305,7 +305,7 @@ services:
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_09:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -317,7 +317,7 @@ services:
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_10:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -329,7 +329,7 @@ services:
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_11:
-    image: ${AWAY_BOT:-lugobots/level-1:latest}
+    image: ${AWAY_BOT:-lugobots/level-0:latest}
     depends_on:
         game_server:
           condition: service_healthy
