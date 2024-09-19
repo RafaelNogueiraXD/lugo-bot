@@ -69,7 +69,7 @@ class MyBot(lugo4py.Bot, ABC):
 
             if dist_to_goal <= 2200:
                 my_order = self.kick_to_goal(me, inspector, opponent_goal)
-            elif obstacles and lugo4py.distance_between_points(obstacles[0], me.position) < lugo4py.PLAYER_SIZE * 5:
+            elif obstacles and lugo4py.distance_between_points(obstacles[0], me.position) < lugo4py.PLAYER_SIZE * 8:
                 
                 close_allies = self.nearest_players(
                     my_team,
@@ -83,7 +83,8 @@ class MyBot(lugo4py.Bot, ABC):
                 print()
                 best_pass_player = self.find_best_pass(close_allies, me.position, inspector)
                 my_order = inspector.make_order_kick_max_speed(best_pass_player.position)
-            else:
+            else: 
+                print("preciso correr e chutar!")
                 my_order = inspector.make_order_move_max_speed(opponent_goal.get_center())
 
             return [my_order]
@@ -291,13 +292,13 @@ class MyBot(lugo4py.Bot, ABC):
                 my_position,
                 candidate['player'].position,
                 opponents,
-                lugo4py.PLAYER_SIZE * 2
+                lugo4py.PLAYER_SIZE * 5
             )
             candidates_obstacles_to_kick  = self.find_obstacles(
                 candidate['player'].position,
                 goal_center,
                 opponents,
-                lugo4py.PLAYER_SIZE * 2
+                lugo4py.PLAYER_SIZE * 5
             )
             dist_to_goal = lugo4py.distance_between_points(
                 candidate['player'].position,
@@ -376,6 +377,7 @@ class MyBot(lugo4py.Bot, ABC):
         return move_order
 
     def calculate_new_position(self, origin_position, distance, angle_degrees):
+
      
         angle_radians = math.radians(angle_degrees)
 
@@ -387,3 +389,28 @@ class MyBot(lugo4py.Bot, ABC):
         }
 
         return new_position
+    
+    def calculate_rebound(point_init : lugo4py.Point, point_final : lugo4py.Point):
+        x_inicial = point_init.x
+        y_inicial = point_init.y
+        x_final = point_final.x
+        y_final = point_final.y
+        
+        y_refletido = -y_final
+        
+       
+        if y_refletido - y_inicial != 0:
+            m = (x_final - x_inicial) / (y_refletido - y_inicial)
+        else:
+            m = float('inf') 
+        
+        b = x_inicial - m * y_inicial
+        
+        x_colisao = m * 0 + b 
+        
+        return lugo4py.Point(x_colisao , 0)
+
+
+        
+        
+
