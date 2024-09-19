@@ -80,4 +80,3 @@ def get_my_expected_position(inspector: lugo4py.GameSnapshotInspector, my_mapper
                                            player_tactic_positions[team_state][number]['Row'])
     return expected_region.get_center()
 
-
