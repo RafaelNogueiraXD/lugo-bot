@@ -7,6 +7,7 @@ from settings import get_my_expected_position
 
 
 class MyBot(lugo4py.Bot, ABC):
+    
     def on_disputing(self, inspector: lugo4py.GameSnapshotInspector) -> List[lugo4py.Order]:
         try:
 
@@ -41,6 +42,7 @@ class MyBot(lugo4py.Bot, ABC):
             my_order = None
             kick_order= None
             opponent_goal = self.mapper.get_attack_goal()
+            ball_position = inspector.get_ball().position
             me = inspector.get_me()
             my_team = inspector.get_my_team_players()
             enemy_team = inspector.get_opponent_team()
@@ -83,6 +85,10 @@ class MyBot(lugo4py.Bot, ABC):
                 my_order = inspector.make_order_kick_max_speed(best_pass_player.position)
             else:
                 my_order = inspector.make_order_move_max_speed(opponent_goal.get_center())
+            
+            #volta 4 jogadores para a defesa se a bola esta na zona 4 ou 5
+            #if ball_position > self.zona3:
+            #    self.defense_comeback(inspector, ball_position)
 
             return [my_order]
 
@@ -124,12 +130,10 @@ class MyBot(lugo4py.Bot, ABC):
         return abs(region_origin.get_row() - dest_origin.get_row()) <= max_distance and abs(
             region_origin.get_col() - dest_origin.get_col()) <= max_distance
 
-
     def determine_catchers(self,inspector, ball_position,n_catchers=2):
         me = inspector.get_me()  
         my_team = inspector.get_my_team_players()
         closest_players = self.get_closest_players(ball_position, my_team)
-
         catchers = closest_players[:n_catchers]
 
         if me in catchers:
@@ -145,6 +149,7 @@ class MyBot(lugo4py.Bot, ABC):
         else:
             my_order = inspector.make_order_kick_max_speed(opponent_goal.get_top_pole())
         return my_order
+    
     def get_closest_players(self, point, player_list):
         
         def sortkey(player):
@@ -272,6 +277,13 @@ class MyBot(lugo4py.Bot, ABC):
         candidates.sort(key=lambda x: x['score'], reverse=True)
         return candidates[0]['player']
 
+    def four_furthest_allies(self, inspector, ball_position):
+        my_team = inspector.get_my_team_players()
+        furthest_allies = list(reversed(self.get_closest_players(ball_position, my_team)))
+        return[furthest_allies[:4]]
+    
+    def defense_comeback(self, inspector, ):
+        ...
     """
         def find_best_pass(self, close_mates, my_position, reader):
     candidates = []
