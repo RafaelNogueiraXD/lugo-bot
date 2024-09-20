@@ -150,7 +150,7 @@ class MyBot(lugo4py.Bot, ABC):
                 my_team,
                 me.position,
                 3, # pega tres players mais proximos do proprio time
-                [1, self.number] # ignora goleiro e eu mesmo
+                [1] # ignora goleiro e eu mesmo
                 )
                 best_pass_player = self.find_best_pass(close_allies, me.position, inspector)
                 if best_pass_player.position is None: 
@@ -410,7 +410,13 @@ class MyBot(lugo4py.Bot, ABC):
         
         return lugo4py.Point(x_colisao , 0)
 
+    def four_furthest_allies(self, inspector, ball_position):
+        my_team = inspector.get_my_team_players()
+        furthest_allies = list(reversed(self.get_closest_players(ball_position, my_team)))
+        return[furthest_allies[:4]]
 
+#def defense_comeback(self, inspector, ):
+        ...
         
-        
+    def field_divide_by_y(self, ):    
 
