@@ -44,7 +44,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=1
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_02:
@@ -60,7 +60,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=2
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
   player_home_03:
     image: bot_watcher
@@ -75,7 +75,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=3
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_04:
@@ -91,7 +91,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=4
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_05:
@@ -107,7 +107,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=5
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_06:
@@ -123,7 +123,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=6
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_07:
@@ -139,7 +139,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=7
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_08:
@@ -155,7 +155,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=8
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_09:
@@ -171,7 +171,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=9
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_10:
@@ -187,7 +187,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=10
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_home_11:
@@ -203,11 +203,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=11
-      - BOT_TEAM=${PLAYER_SIDE:-home}
+      - BOT_TEAM=${PLAYER_SIDE:-away}
       - BOT_GRPC_URL=game_server:5000
 
   player_away_01:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -215,12 +215,12 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=1
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
 
   player_away_02:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -228,12 +228,12 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=2
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
 
   player_away_03:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -241,11 +241,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=3
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_04:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -253,11 +253,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=4
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_05:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -265,11 +265,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=5
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_06:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -277,11 +277,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=6
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_07:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -289,11 +289,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=7
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_08:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -301,11 +301,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=8
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_09:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -313,11 +313,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=9
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_10:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -325,11 +325,11 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=10
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
   player_away_11:
-    image: ${AWAY_BOT:-lugobots/level-0:latest}
+    image: ${AWAY_BOT:-lugobots/level-1:latest}
     depends_on:
         game_server:
           condition: service_healthy
@@ -337,7 +337,7 @@ services:
           condition: service_completed_successfully
     environment:
       - BOT_NUMBER=11
-      - BOT_TEAM=${OPPONENT_SIDE:-away}
+      - BOT_TEAM=${OPPONENT_SIDE:-home}
       - MODE=${MODE:-default} # default zombies statues kids defenses
       - BOT_GRPC_URL=game_server:5000
 
