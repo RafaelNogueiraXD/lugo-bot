@@ -17,9 +17,9 @@ PLAYER_INITIAL_POSITIONS = {
      6: {'Col': 6, 'Row': 5},
      7: {'Col': 6, 'Row': 3},
      8: {'Col': 6, 'Row': 1},
-     9: {'Col': 9, 'Row': 6},
+     9: {'Col': 7, 'Row': 6},
      10: {'Col': 8, 'Row': 4},
-     11: {'Col': 9, 'Row': 2},
+     11: {'Col': 7, 'Row': 2},
 }
 
 #inspector = informações do jogo
@@ -53,16 +53,16 @@ def get_my_expected_position(inspector: lugo4py.GameSnapshotInspector, my_mapper
             11: {'Col': 8, 'Row': 2},
         },
         'NORMAL': {
-            2: {'Col': 2, 'Row': 1},
-            3: {'Col': 4, 'Row': 2},
-            4: {'Col': 4, 'Row': 3},
-            5: {'Col': 2, 'Row': 4},
-            6: {'Col': 6, 'Row': 1},
-            7: {'Col': 8, 'Row': 2},
-            8: {'Col': 8, 'Row': 3},
-            9: {'Col': 6, 'Row': 4},
-            10: {'Col': 7, 'Row': 4},
-            11: {'Col': 7, 'Row': 1},
+            2: {'Col': 6, 'Row': 4},
+            3: {'Col': 7, 'Row': 3},
+            4: {'Col': 7, 'Row': 5},
+            5: {'Col': 9, 'Row': 2},
+            6: {'Col': 9, 'Row': 2},
+            7: {'Col': 11, 'Row': 1},
+            8: {'Col': 12, 'Row': 2},
+            9: {'Col': 11, 'Row': 7},
+            10: {'Col': 12, 'Row': 6},
+            11: {'Col': 14, 'Row': 4},
         },
         'OFFENSIVE': {
             2: {'Col': 7, 'Row': 3},

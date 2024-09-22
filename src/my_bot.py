@@ -160,16 +160,24 @@ class MyBot(lugo4py.Bot, ABC):
                 3, # pega tres players mais proximos do proprio time
                 [1] # ignora goleiro e eu mesmo
                 )
+                best_pass_player = None
                 best_pass_player = self.find_best_pass(close_allies, me.position, inspector)
-                if best_pass_player.position is None: 
+                if best_pass_player is None: 
+                    print("ENTROU")
                     if self.best_direction_goalkeeper_kick_y(inspector):
-                        position_pass = lugo4py.Point(lugo4py.MAX_X_COORDINATE, 19000)
+                        if self.side == 0: 
+                            position_pass = lugo4py.Point(3000, lugo4py.MAX_Y_COORDINATE)
+                        else: 
+                            position_pass = lugo4py.Point(17000, lugo4py.MAX_Y_COORDINATE)
                     else:
-                        position_pass = lugo4py.Point(lugo4py.MAX_X_COORDINATE,100)
+                        if self.side == 0: 
+                            position_pass = lugo4py.Point(3000,0)
+                        else: 
+                            position_pass = lugo4py.Point(17000,0)
                 else:
                     position_pass = best_pass_player.position
             
-                print("chute na direção ", position_pass)
+                print(f"chute na direção x = {position_pass.x} y = {position_pass.y}")
                 my_order = inspector.make_order_kick_max_speed(position_pass)
                 return [my_order]
             my_order = inspector.make_order_move_max_speed(position)
@@ -366,9 +374,30 @@ class MyBot(lugo4py.Bot, ABC):
         my_team = inspector.get_my_team_players()
         furthest_allies = list(reversed(self.get_closest_players(ball_position, my_team)))
         return[furthest_allies[:4]]
+    
 
-#def defense_comeback(self, inspector, ):
+    def best_direction_goalkeeper_kick_y(self, inspector: lugo4py.GameSnapshotInspector):
+        enemy_team = inspector.get_opponent_players()
+        counterUp = 0
+        counterDown = 0
+        for enemy in enemy_team:
+            if enemy.position.y <= 5000:
+                counterDown += 1
+            else:
+                counterUp += 1
+        
+        if counterDown > counterUp:
+            return True
+        else:
+            return False
+    def find_a_player(self, number, team):
+        for player in team:
+            if number == player.number:
+                return player
+
+
+    #def defense_comeback(self, inspector, ):
         ...
         
-    def field_divide_by_y(self, ):    
+    # def field_divide_by_y(self, ):    
 
