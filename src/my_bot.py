@@ -10,6 +10,7 @@ from settings import get_my_expected_position
 from botMath import *
 
 class MyBot(lugo4py.Bot, ABC):
+    
     def on_disputing(self, inspector: lugo4py.GameSnapshotInspector) -> List[lugo4py.Order]:
         try:
 
@@ -44,6 +45,7 @@ class MyBot(lugo4py.Bot, ABC):
             my_order = None
             kick_order= None
             opponent_goal = self.mapper.get_attack_goal()
+            ball_position = inspector.get_ball().position
             me = inspector.get_me()
             my_team = inspector.get_my_team_players()
             enemy_team = inspector.get_opponent_team()
@@ -88,6 +90,10 @@ class MyBot(lugo4py.Bot, ABC):
             else: 
                 print("preciso correr e chutar!")
                 my_order = inspector.make_order_move_max_speed(opponent_goal.get_center())
+            
+            #volta 4 jogadores para a defesa se a bola esta na zona 4 ou 5
+            #if ball_position > self.zona3:
+            #    self.defense_comeback(inspector, ball_position)
 
             return [my_order]
 
@@ -156,7 +162,10 @@ class MyBot(lugo4py.Bot, ABC):
                 )
                 best_pass_player = self.find_best_pass(close_allies, me.position, inspector)
                 if best_pass_player.position is None: 
-                    position_pass = lugo4py.Point(4900, 7500)
+                    if self.best_direction_goalkeeper_kick_y(inspector):
+                        position_pass = lugo4py.Point(lugo4py.MAX_X_COORDINATE, 19000)
+                    else:
+                        position_pass = lugo4py.Point(lugo4py.MAX_X_COORDINATE,100)
                 else:
                     position_pass = best_pass_player.position
             
@@ -180,11 +189,11 @@ class MyBot(lugo4py.Bot, ABC):
             region_origin.get_col() - dest_origin.get_col()) <= max_distance
 
 
-    def determine_catchers(self,inspector : lugo4py.GameSnapshotInspector, ball_position,n_catchers=2):
+    def determine_catchers(self,inspector, ball_position,n_catchers=2):
         me = inspector.get_me()  
         my_team = inspector.get_my_team_players()
         closest_players = self.get_closest_players(ball_position, my_team)
-        
+
         catchers = closest_players[:n_catchers]
 
         if me in catchers:
@@ -201,12 +210,6 @@ class MyBot(lugo4py.Bot, ABC):
         else:
             my_order = inspector.make_order_kick_max_speed(opponent_goal.get_top_pole())
         return my_order
-    
-    def find_a_player(self, number, team):
-        for player in team:
-            if number == player.number:
-                return player
-            
     def get_closest_players(self, point, player_list):
         
         def sortkey(player):
@@ -322,6 +325,8 @@ class MyBot(lugo4py.Bot, ABC):
             angle['behind'] = 0
         ball_holder = inspector.get_ball().holder
         ball_holder_position = ball_holder.position
+
+        # Distância que os aliados devem manter do portador da bola
         distance = lugo4py.PLAYER_SIZE * 5
 
         my_team = inspector.get_my_team_players()
@@ -365,5 +370,5 @@ class MyBot(lugo4py.Bot, ABC):
 #def defense_comeback(self, inspector, ):
         ...
         
-    # def field_divide_by_y(self, ):    
+    def field_divide_by_y(self, ):    
 
