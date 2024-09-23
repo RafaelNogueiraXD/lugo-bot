@@ -81,15 +81,29 @@ class MyBot(lugo4py.Bot, ABC):
                     3, # pega tres players mais proximos do proprio time
                     [1, self.number] # ignora goleiro e eu mesmo
                 )
+                # my_order = self.drible(close_enemys=close_enemys, me=me, inspector=inspector)
+                # if lugo4py.distance_between_points(close_enemys[0]['player'].position, me.position) < lugo4py.PLAYER_SIZE + 300:
+                #     if close_enemys[0].position.y > me.position.y: 
+                #         print("drible")
+                #         return [inspector.make_order_move_max_speed(lugo4py.Point(me.position.x,0))]
+                #     else:
+                #         return [inspector.make_order_move_max_speed(lugo4py.Point(me.position.x,10000))]
+                    
                 print("aliados proximos sao: ",end=" ")
                 for allies in close_allies:
                     print(allies['number'] ,end=" ")
                 print()
                 best_pass_player = self.find_best_pass(close_allies, me.position, inspector)
-                my_order = inspector.make_order_kick_max_speed(best_pass_player.position)
+                if best_pass_player != None:
+                    my_order = inspector.make_order_kick_max_speed(best_pass_player.position)
+                else:
+                    my_order = inspector.make_order_move_max_speed(opponent_goal.get_center())
+                    # my_order = self.drible(close_enemys=close_enemys, me=me, inspector=inspector)
             else: 
                 print("preciso correr e chutar!")
                 my_order = inspector.make_order_move_max_speed(opponent_goal.get_center())
+
+
             
             #volta 4 jogadores para a defesa se a bola esta na zona 4 ou 5
             #if ball_position > self.zona3:
@@ -102,43 +116,68 @@ class MyBot(lugo4py.Bot, ABC):
             traceback.print_exc()
 
     def on_supporting(self, inspector: lugo4py.GameSnapshotInspector) -> List[lugo4py.Order]:
-    
         try:
             ball_position = inspector.get_ball().position
             me = inspector.get_me()
-            # move_order = self.determine_catchers(inspector, ball_position,1)
+            
+            # Determinar o destino inicial do movimento
             move_destination = get_my_expected_position(inspector, self.mapper, self.number)
 
+            # Se o jogador com a bola for o número 1 e você for o número 2
             if inspector.get_ball().holder.number == 1 and self.number == 2: 
                 move_destination = get_my_expected_position(inspector, self.mapper, self.number)
-                my_order = inspector.make_order_move_max_speed(move_destination)
-                return [my_order]
-            
+
+                # Verifica se o destino do movimento é igual à posição atual
+                if move_destination != me.position:
+                    my_order = inspector.make_order_move_max_speed(move_destination)
+                    return [my_order]
+                else:
+                    print("Destino é igual à posição atual, sem movimento necessário.")
+                    return []
+
+            # Encontrar jogadores mais próximos da bola
             close_players = self.nearest_players(
                 inspector.get_my_team_players(),
                 ball_position,
                 3,
                 [1, inspector.get_ball().holder.position]
             )
-            print("tenho que acompanhar ",close_players)
-            if any( player['number'] == self.number for player in close_players):
+            
+            print("tenho que acompanhar", close_players)
+            
+            # Se o jogador atual estiver entre os mais próximos
+            if any(player['number'] == self.number for player in close_players):
                 dist_to_mate = lugo4py.distance_between_points(me.position, ball_position)
-                if dist_to_mate > lugo4py.PLAYER_SIZE*4:
+                
+                # Decidir o destino com base na distância
+                if dist_to_mate > lugo4py.PLAYER_SIZE * 4:
                     move_destination = ball_position
                 else: 
                     opponent_goal = self.mapper.get_attack_goal()
                     goal_center = opponent_goal.get_center()
                     move_destination = goal_center
-            move_order = self.position_allies_around_holder(inspector)
-            if move_order == None:
-                move_order = inspector.make_order_move_max_speed(move_destination)
 
+            # Posicionar aliados ao redor do jogador com a bola
+            move_order = self.position_allies_around_holder(inspector)
+            
+            # Se não houver ordem de posicionamento, faça o movimento
+            if move_order is None:
+                if move_destination != me.position:
+                    move_order = inspector.make_order_move_max_speed(move_destination)
+                else:
+                    move_order = inspector.make_order_move_max_speed(lugo4py.Point(me.position.x+1,me.position.y+1))
+
+            # Ordem para pegar a bola
             catch_order = inspector.make_order_catch()
 
+            # Retornar as ordens de movimento e captura
             return [move_order, catch_order]
 
         except Exception as e:
             print(f'did not play this turn due to exception {e}')
+            return []
+
+        except Exception as e:
             traceback.print_exc()
     # def tabelinha():
     def as_goalkeeper(self, inspector: lugo4py.GameSnapshotInspector, state: lugo4py.PLAYER_STATE) -> List[lugo4py.Order]:
@@ -191,13 +230,22 @@ class MyBot(lugo4py.Bot, ABC):
     def getting_ready(self, snapshot: lugo4py.GameSnapshot):
         print('getting ready')
 
+    # def drible(self,close_enemys, me, inspector : lugo4py.GameSnapshotInspector):
+    #     if lugo4py.distance_between_points(close_enemys[0]['player'].position, me.position) < lugo4py.PLAYER_SIZE + 300:
+    #         if close_enemys[0].position.y > me.position.y: 
+    #             print("drible")
+    #             return [inspector.make_order_move_max_speed(lugo4py.Point(self.mapper.get_attack_goal()._center.x, 0))]
+    #         else:
+    #             return [inspector.make_order_move_max_speed(lugo4py.Point(self.mapper.get_attack_goal()._center.x,10000))]
+
+
     def is_near(self, region_origin: lugo4py.mapper.Region, dest_origin: lugo4py.mapper.Region) -> bool:
         max_distance = 2
         return abs(region_origin.get_row() - dest_origin.get_row()) <= max_distance and abs(
             region_origin.get_col() - dest_origin.get_col()) <= max_distance
 
 
-    def determine_catchers(self,inspector, ball_position,n_catchers=2):
+    def determine_catchers(self,inspector: lugo4py.GameSnapshotInspector, ball_position,n_catchers=2):
         me = inspector.get_me()  
         my_team = inspector.get_my_team_players()
         closest_players = self.get_closest_players(ball_position, my_team)
@@ -207,7 +255,11 @@ class MyBot(lugo4py.Bot, ABC):
         if me in catchers:
             move_order = inspector.make_order_move_max_speed(ball_position)
         else:
-            move_order = inspector.make_order_move_max_speed(get_my_expected_position(inspector, self.mapper, self.number))
+            me = inspector.get_me()
+            if lugo4py.distance_between_points(get_my_expected_position(inspector, self.mapper, self.number), me.position) > lugo4py.PLAYER_SIZE:
+                move_order = inspector.make_order_move_max_speed(get_my_expected_position(inspector, self.mapper, self.number))
+            else: 
+                move_order = inspector.make_order_move(lugo4py.Point(me.position.x+1,me.position.y+1), 50)
         
         return move_order
 
@@ -363,11 +415,18 @@ class MyBot(lugo4py.Bot, ABC):
             'position': new_position_behind
         })
         move_order = None
+        me = inspector.get_me()
         for ally in positions:
-            if self.number == ally['player'].number and ally['position']["x"] > 0 and ally['position']["y"] > 0 :
-                move_order = inspector.make_order_move_max_speed(lugo4py.Point(ally['position']["x"],ally['position']["y"]))
+            if self.number == ally['player'].number and ally['position']["x"] > 0 and ally['position']["y"] > 0:
+                if lugo4py.distance_between_points(me.position, lugo4py.Point(ally['position']["x"],ally['position']["y"])) < lugo4py.PLAYER_SIZE:
+                    move_order = inspector.make_order_move_max_speed(self.mapper.get_defense_goal()._center)
+                else: 
+                    move_order = inspector.make_order_move_max_speed(lugo4py.Point(ally['position']["x"],ally['position']["y"]))
                 print(f" eu tenho que estar em : x = { ally['position'] } ,  y = { ally['position'] }")
-     
+                
+
+
+
         return move_order
 
     def four_furthest_allies(self, inspector, ball_position):
@@ -394,10 +453,3 @@ class MyBot(lugo4py.Bot, ABC):
         for player in team:
             if number == player.number:
                 return player
-
-
-    #def defense_comeback(self, inspector, ):
-        ...
-        
-    # def field_divide_by_y(self, ):    
-
